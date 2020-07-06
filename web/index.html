@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="application-name" content="Anwinity">
+		<meta name="robots" content="INDEX,FOLLOW">
+		<meta name="googlebot" content="INDEX,FOLLOW">
+		<meta name="keywords" content="Anwinity,DH3,Diamond Hunt,Diamond,Idle,Game">
+		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
+			rel="stylesheet" 
+			integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" 
+			crossorigin="anonymous">
+		<link href="https://anwinity.com/common/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://anwinity.com/common/bootswatch/4.5.0/darkly/bootstrap.min.css" rel="stylesheet">
+		<link href="index.css?v=%VERSION%" rel="stylesheet">
+		<title>Anwinity's DH3 Tools</title>
+	</head>
+	<body>
+		<div id="app" style="margin:0; padding:0; border:0">
+			
+			<div id="main-container" class="container pb-2">
+				<!-- Nav -->
+				<nav id="main-nav" class="navbar navbar-expand-lg navbar-dark bg-dark mb-2">
+					<a class="navbar-brand" href=""><img src="images/diamond.png" width="30" height="30" loading="lazy" />&nbsp;DH3 Tools</a>
+					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse" id="navbarContent">
+						<ul class="navbar-nav mr-auto">
+							<li class="nav-item" :class="{active: tab=='updates'}">
+								<a class="nav-link" href="#" @click.prevent="setTab('updates')">Updates</a>
+							</li>
+							<li class="nav-item" :class="{active: tab=='data'}">
+								<a class="nav-link" href="#" @click.prevent="setTab('data')">Data</a>
+							</li>
+							<li class="nav-item" :class="{active: tab=='market'}">
+								<a class="nav-link" href="#" @click.prevent="setTab('market')">Market</a>
+							</li>
+							<li class="nav-item" :class="{active: tab=='combat'}">
+								<a class="nav-link" href="#" @click.prevent="setTab('combat')">Combat</a>
+							</li>
+							<li class="nav-item" :class="{active: tab=='miningRates'}">
+								<a class="nav-link" href="#" @click.prevent="setTab('miningRates')">Mining Rates</a>
+							</li>
+							<li class="nav-item" :class="{active: tab=='miningCraftingCalc'}">
+								<a class="nav-link" href="#" @click.prevent="setTab('miningCraftingCalc')">Mining/Crafting</a>
+							</li>
+							<li class="nav-item" :class="{active: tab=='farming'}">
+								<a class="nav-link" href="#" @click.prevent="setTab('farming')">Farming</a>
+							</li>
+							<li class="nav-item" :class="{active: tab=='brewingCalc'}">
+								<a class="nav-link" href="#" @click.prevent="setTab('brewingCalc')">Brewing</a>
+							</li>
+							<li class="nav-item" :class="{active: tab=='contact'}">
+								<a class="nav-link" href="#" @click.prevent="setTab('contact')">Contact Me</a>
+							</li>
+						</ul>
+					</div>
+				</nav>
+				
+				<!-- Updates -->
+				<div v-if="tab=='updates'" v-cloak>
+					<template v-for="update in updates">
+						<h6>{{update.date}}</h6>
+						<ul>
+							<li v-for="content in update.content">{{content}}</li>
+						<ul>
+					</template>
+				</div>
+				
+				<!-- Data -->
+				<div v-else-if="tab=='data'" v-cloak>
+					
+					<p>Enter your DH3 data below. Once DH3 adds the ability to pull this data directly, I can take your username and automatically fill these in. But, for now, you'll have to do it manually.</p>
+					
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col">
+								<form>
+									<div v-for="skill in skills" class="form-group row">
+										<label :for="'data-'+skill.key+'-xp'" class="col-sm-12 col-md-6 col-form-label">
+											<img v-if="skill.image" :src="skill.image" class="img-inline-25">
+											<span>{{skill.name}}&nbsp;<b class="text-white">({{skillLevels[skill.key]}})</b>&nbsp;
+											<span><i class="fas fa-long-arrow-alt-up"></i>&nbsp;{{commafy(skillNext[skill.key])}}</span></span>
+										</label>
+										<div class="col-sm-12 col-md-6">
+											<input v-model.number="skill.xp" @change="saveCookie()" :id="'data-'+skill.key+'-xp'" type="number" step="1" min="0" class="form-control">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label for="data-stardust" class="col-sm-12 col-md-6 col-form-label">
+											<img src="images/stardustIcon.png" class="img-inline-25">
+											<span>Stardust</span>
+										</label>
+										<div class="col-sm-12 col-md-6">
+											<input v-model.number="stardust" @change="saveCookie()" type="number" step="1" min="0" id="data-stardust" class="form-control">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label for="data-oil-income" class="col-sm-12 col-md-6 col-form-label">
+											<img src="images/oil.png" class="img-inline-25">
+											<span>Oil Income</span>
+										</label>
+										<div class="col-sm-12 col-md-6">
+											<input v-model.number="oilIncome" @change="saveCookie()" type="number" step="1" min="0" id="data-oil-income" class="form-control">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label for="data-mana" class="col-sm-12 col-md-6 col-form-label">
+											<img src="images/hugeManaStar.png" class="img-inline-25">
+											<span>Mana</span>
+										</label>
+										<div class="col-sm-12 col-md-6">
+											<input v-model.number="mana" @change="saveCookie()" type="number" step="1" min="0" id="data-mana" class="form-control">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label for="data-donor-bonus" class="col-sm-12 col-md-6 col-form-label">
+											<img src="images/donorCoins.png" class="img-inline-25">
+											<span>Donor 10% XP</span>
+										</label>
+										<div class="col-sm-12 col-md-6">
+											<div class="form-check">
+												<input v-model="donorBonus" @change="saveCookie()" class="form-check-input" type="checkbox" id="data-donor-bonus">
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="col">
+								<form>
+									<div v-for="tool in tools" class="form-group row">
+										<label :for="'data-'+tool.key+'-gem'" class="col-9 col-sm-9 col-md-4 col-form-label">
+											<img v-if="tool.image" :src="tool.image" class="img-inline-25">
+											<span>{{tool.name}}</span>
+										</label>
+										<label class="col-3 col-sm-3 col-md-2 col-form-label">
+											<img v-if="gems[tool.gem].image" :src="gems[tool.gem].image" class="img-inline-25">
+										</label>
+										<div class="col-12 col-sm-12 col-md-6">
+											<select v-model="tool.gem" @change="saveCookie()" :id="'data-'+tool.key+'-gem'" class="custom-select">
+												<option v-for="gem in gems" :value="gem.key">
+													{{gem.name}}
+												</option>
+											</select>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					
+					<div class="container-fluid mt-4">
+						<div class="row">
+							<div class="col">
+								<table class="table table-bordered table-sm">
+									<thead>
+										<tr class="bg-primary">
+											<th class="text-right">Level</th>
+											<th class="text-right">XP</th>
+											<th class="text-right">Level</th>
+											<th class="text-right">XP</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="lv in 50" class="bg-secondary">
+											<td class="text-right">{{lv}}</td>
+											<td class="text-right">{{commafy(levels[lv])}}</td>
+											<td class="text-right">{{lv+50}}</td>
+											<td class="text-right">{{commafy(levels[lv+50])}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+				
+				<!-- Market -->
+				<div v-else-if="tab=='market'" v-cloak>
+					<template v-if="market.time">
+						<p class="text-center">
+							Updated: {{market.time}}<br />
+							This data is based on what is for sale on the market.
+						</p>
+						<table class="table table-bordered table-sm table-hover">
+							<thead>
+								<tr class="bg-primary">
+									<td>Item</td>
+									<td>Category</td>
+									<td>Available</td>
+									<td>Hard Min</td>
+									<td>Hard Max</td>
+									<td>Min</td>
+									<td>Max</td>
+									<td>Average</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="item in market.items">
+									<td>
+										<img v-if="item.image" :src="item.image" class="img-inline-25">
+										<span>&nbsp;{{item.name}}</span>
+									</td>
+									<td>{{commafy(item.category)}}</td>
+									<td class="text-right">{{commafy(item.amount)}}</td>
+									<td class="text-right">{{commafy(item.hardMin)}}</td>
+									<td class="text-right">{{commafy(item.hardMax)}}</td>
+									<td class="text-right">{{item.min>=0?commafy(item.min):'-'}}</td>
+									<td class="text-right">{{item.max>=0?commafy(item.max):'-'}}</td>
+									<td class="text-right">{{item.min>=0?commafy(Math.round(item.average)):'-'}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</template>
+					<template v-else>
+						<p class="text-center">
+							Market data not currently available.
+						</p>
+					</template>
+				</div>
+				
+				<!-- Combat -->
+				<div v-else-if="tab=='combat'" v-cloak>
+					<table class="table table-bordered table-sm table-hover">
+						<thead>
+							<tr class="bg-primary">
+								<th>Zone</th>
+								<th><img src="images/energy.png" class="img-inline-25">&nbsp;Energy</th>
+								<th><img src="images/hourglass.png" class="img-inline-25">&nbsp;Cooldown</th>
+								<th>Average XP</th>
+								<th>XP/Energy</th>
+								<th>XP/Minute</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="zone in zones">
+								<td>{{zone.name}}</td>
+								<td class="text-right">{{zone.energy}}</td>
+								<td class="text-right">{{zone.cooldown}} min</td>
+								<td class="text-right">{{(zoneAverageXP[zone.key]).toFixed(1)}}</td>
+								<td class="text-right">{{(zoneAverageXP[zone.key]/zone.energy).toFixed(4)}}</td>
+								<td class="text-right">{{(zoneAverageXP[zone.key]/zone.cooldown).toFixed(2)}}</td>
+							</tr>
+						</tbody>
+					</table>
+					
+					<table class="table table-bordered table-sm">
+						<thead>
+							
+						</thead>
+						<tbody>
+							<tr class="bg-primary">
+								<td>Monster</td>
+								<td>Stats</td>
+								<td>XP</td>
+							</tr>
+							<template v-for="zone in zones">
+								<tr class="bg-secondary">
+									<td colspan="3">{{zone.name}}</td>
+								</tr>
+								<tr v-for="monster in zone.monsters">
+									<td>
+										<img :src="monster.image" class="img-inline-50" />
+										<span>&nbsp;{{monster.name}}</span>
+									</td>
+									<td>
+										<img src="images/heart_grey.png" class="img-inline-25" />
+										{{monster.health}}&nbsp;
+										<img src="images/attack.png" class="img-inline-25" />
+										{{monster.attack}}&nbsp;
+										<img src="images/accuracy.png" class="img-inline-25" />
+										{{monster.accuracy}}&nbsp;
+										<img src="images/speed.png" class="img-inline-25" />
+										{{monster.speed}}&nbsp;
+										<img src="images/defence.png" class="img-inline-25" />
+										{{monster.defence}}
+									</td>
+									<td class="text-right">{{monster.xp}}</td>
+								</tr>
+							</template>
+						</tbody>
+					</table>
+				</div>
+				
+				<!-- Mining Rates -->
+				<div v-else-if="tab=='miningRates'" v-cloak>
+					<table class="table table-bordered table-sm">
+						<thead>
+							<tr class="bg-primary">
+								<th>Ore</th>
+								<th>Tool</th>
+								<th>Per Second</th>
+								<th>Per Hour</th>
+								<th>Per Day</th>
+								<th>Oil</th>
+								<th>Per Second/Oil</th>
+							</tr>
+						</thead>
+						<tbody>
+							<template v-for="ore in ores" v-if="ore.key!='none'">
+								<tr :class="ore.bgClass">
+									<td>
+										<img :src="ore.image" class="img-inline-25" />
+										<span>&nbsp;{{ore.name}}</span>
+									</td>
+									<td>
+										<img src="images/miner.gif" class="img-inline-25" />
+										<span>&nbsp;Miner</span>
+									</td>
+									<td class="text-right">{{ore.tickChanceMiner.toFixed(7)}}</td>
+									<td class="text-right">{{(ore.tickChanceMiner*3600).toFixed(3)}}</td>
+									<td class="text-right">{{commafy((ore.tickChanceMiner*86400).toFixed(3))}}</td>
+									<td class="text-right">0</td>
+									<td class="text-right">-</td>
+								</tr>
+								<tr :class="ore.bgClass">
+									<td>
+										<img :src="ore.image" class="img-inline-25" />
+										<span>&nbsp;{{ore.name}}</span>
+									</td>
+									<td>
+										<img src="images/drills.gif" class="img-inline-25" />
+										<span>&nbsp;Drill</span>
+									</td>
+									<td class="text-right">{{ore.tickChanceDrill.toFixed(7)}}</td>
+									<td class="text-right">{{(ore.tickChanceDrill*3600).toFixed(3)}}</td>
+									<td class="text-right">{{commafy((ore.tickChanceDrill*86400).toFixed(3))}}</td>
+									<td class="text-right">1</td>
+									<td class="text-right">{{ore.tickChanceDrill.toFixed(7)}}</td>
+								</tr>
+								<tr :class="ore.bgClass">
+									<td>
+										<img :src="ore.image" class="img-inline-25" />
+										<span>&nbsp;{{ore.name}}</span>
+									</td>
+									<td>
+										<img src="images/crushers.gif" class="img-inline-25" />
+										<span>&nbsp;Crusher</span>
+									</td>
+									<td class="text-right">{{ore.tickChanceCrusher.toFixed(7)}}</td>
+									<td class="text-right">{{(ore.tickChanceCrusher*3600).toFixed(3)}}</td>
+									<td class="text-right">{{commafy((ore.tickChanceCrusher*86400).toFixed(3))}}</td>
+									<td class="text-right">3</td>
+									<td class="text-right">{{(ore.tickChanceCrusher/3).toFixed(7)}}</td>
+								</tr>
+							</template>
+						</tbody>
+					</table>
+					
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col">
+								<form>
+									<div v-for="machine in machines" class="form-group row">
+										<label :for="'data-'+machine.key+'-machine'" class="col-9 col-sm-9 col-md-4 col-form-label">
+											<img v-if="machine.image" :src="machine.image" class="img-inline-25">
+											<span>{{machine.name}}</span>
+										</label>
+										<label class="col-3 col-sm-3 col-md-2 col-form-label">
+											<img v-if="machine.ore!='none' && ores[machine.ore].image" :src="ores[machine.ore].image" class="img-inline-25">
+										</label>
+										<div class="col-12 col-sm-12 col-md-6">
+											<select v-model="machine.ore" @change="saveCookie()" :id="'data-'+machine.key+'-machine'" class="custom-select">
+												<option v-for="ore in ores" :value="ore.key">
+													{{ore.name}}
+												</option>
+											</select>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="col">
+								<table class="table table-bordered table-sm">
+									<thead>
+										<tr class="bg-primary">
+											<th>Resource</th>
+											<th>Per Second</th>
+											<th>Per Hour</th>
+											<th>Per Day</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="ore in ores" v-if="ore.key!='none'" :class="ore.bgClass">
+											<td>
+												<img :src="ore.image" class="img-inline-25" />
+												<span>&nbsp;{{ore.name}}</span>
+											</td>
+											<td class="text-right">{{commafy(miningRates[ore.key].toFixed(5))}}</td>
+											<td class="text-right">{{commafy((sph*miningRates[ore.key]).toFixed(3))}}</td>
+											<td class="text-right">{{commafy((spd*miningRates[ore.key]).toFixed(3))}}</td>
+										</tr>
+										<tr class="dh3-bg-oil">
+											<td>
+												<img src="images/oil_darker.png" class="img-inline-25" />
+												<span>&nbsp;Oil</span>
+											</td>
+											<td class="text-right"><span v-if="oilIncome>=miningRates['oil']">+</span>{{oilIncome - miningRates["oil"]}}</td>
+											<td class="text-right"><span v-if="oilIncome>=miningRates['oil']">+</span>{{commafy(sph*(oilIncome - miningRates["oil"]))}}</td>
+											<td class="text-right"><span v-if="oilIncome>=miningRates['oil']">+</span>{{commafy(spd*(oilIncome - miningRates["oil"]))}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+						</div>
+					</div>
+					
+					<div class="container-fluid mt-4">
+						<table class="table table-bordered table-sm">
+							<thead>
+								<tr class="bg-primary">
+									<th colspan="4">Mining Optimizer <small class="text-warning">&nbsp;&nbsp;&nbsp;<i class="fas fa-exclamation-triangle"></i>&nbsp;Experimental</small></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="bg-secondary">
+									<td>Optimize&nbsp;For</td>
+									<td>
+										<select v-model="miningRateOptimizer.optimizeFor" @change="saveCookie()" :disabled="miningRateOptimizer.busy" class="form-control form-control-sm">
+											<option value="coins">Coins</option>
+											<option value="ores">Ore</option>
+											<option value="mining">Mining XP</option>
+											<option value="crafting">Crafting XP</option>
+										</select>
+									</td>
+									<td><img src="images/oil_darker.png" class="img-inline-25">Oil&nbsp;Income</td>
+									<td>
+										<input v-model.number="oilIncome" @change="saveCookie()" :disabled="miningRateOptimizer.busy" type="number" step="1" min="0" id="mining-optimizer-oil-income" class="form-control form-control-sm">
+									</td>
+								</tr>
+								<tr class="bg-primary">
+									<td>Ore</td>
+									<td>Include</td>
+									<td colspan="2">
+										<span v-if="miningRateOptimizer.optimizeFor=='coins'">Value <small>(the value for ore, whether selling or smelting)</small></span>
+										<span v-else-if="miningRateOptimizer.optimizeFor=='ores'">Amount <small>(the amount of ore you want to acquire)</small></span>
+										<span v-else>XP</span>
+									</td>
+								</tr>
+								<tr v-for="ore in ores" v-if="ore.key!='none'" :class="[{'row-disabled': !miningRateOptimizer.ores[ore.key].include || miningRateOptimizerForceDisabled[ore.key]}, ore.bgClass]">
+									<td>
+										<img :src="ore.image" class="img-inline-25" />
+										<span>{{ore.name}}</span>
+									</td>
+									<td>
+										<div class="form-check">
+											<input v-model="miningRateOptimizer.ores[ore.key].include" class="form-check-input" type="checkbox"
+												:disabled="miningRateOptimizer.busy || miningRateOptimizerForceDisabled[ore.key]"
+												@change="saveCookie()">
+										</div>
+									</td>
+									<td colspan="2">
+										<template v-if="miningRateOptimizer.optimizeFor=='coins'">
+											<input v-model.number="miningRateOptimizer.ores[ore.key].coins" 
+												:disabled="miningRateOptimizer.busy || !miningRateOptimizer.ores[ore.key].include || miningRateOptimizerForceDisabled[ore.key]"
+												@change="saveCookie()"
+												type="number" min="0" class="form-control form-control-sm">
+										</template>
+										<template v-else-if="miningRateOptimizer.optimizeFor=='ores'">
+											<input v-model.number="miningRateOptimizer.ores[ore.key].targetAmount" 
+												:disabled="miningRateOptimizer.busy || !miningRateOptimizer.ores[ore.key].include || miningRateOptimizerForceDisabled[ore.key]"
+												@change="saveCookie()"
+												type="number" min="0" class="form-control form-control-sm">
+										</template>
+										<template v-else-if="miningRateOptimizer.optimizeFor=='mining'">
+											<span v-if="typeof ore.xp==='number'">{{ore.xp}}</span>
+											<span v-else>-</span>
+										</template>
+										<template v-else-if="miningRateOptimizer.optimizeFor=='crafting'">
+											<span v-if="ore.bar && bars[ore.bar] && typeof bars[ore.bar].xp==='number'">{{bars[ore.bar].xp}}</span>
+											<span v-else>-</span>
+										</template>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="4">
+										<button @click="optimizeMining()" type="button" class="btn btn-primary btn-block" :disabled="miningRateOptimizer.busy">
+											<i v-if="miningRateOptimizer.busy" class="fa fa-spinner fa-pulse fa-fw"></i>
+											<span>Optimize!</span>
+											<i v-if="miningRateOptimizer.busy" class="fa fa-spinner fa-pulse fa-fw"></i>
+										</button>
+									</td>
+								</tr>
+								<tr v-if="miningRateOptimizer.result.length > 0">
+									<td>
+										<button @click="applyOptimizedMiningRateResult(); saveCookie();" type="button" class="btn btn-primary btn-block" :disabled="miningRateOptimizer.busy">
+											<span><i class="fas fa-arrow-up"></i>&nbsp;Apply</span>
+										</button>
+									</td>
+									<td colspan="3" class="text-center">
+										<template v-for="result in miningRateOptimizer.result" v-if="result.ore">
+											<img v-if="result.machine=='miner'" src="images/miner.gif" class="img-inline-25" />
+											<img v-else-if="result.machine=='drill'" src="images/drills.gif" class="img-inline-25" />
+											<img v-else-if="result.machine=='crusher'" src="images/crushers.gif" class="img-inline-25" />
+											<img :src="ores[result.ore].image" class="img-inline-25 mr-5" :title="ores[result.ore].name" />
+										</template>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				
+				<!-- Mining/Crafting Calc -->
+				<div v-else-if="tab=='miningCraftingCalc'" v-cloak>
+					
+					<table class="table table-bordered table-sm">
+						<thead>
+							<tr class="bg-primary">
+								<th class="thick-right-border" colspan="3">Rates</th>
+								<th class="thick-right-border" colspan="2">Current Stardust</th>
+								<th class="thick-right-border" colspan="2">Next Level</th>
+								<th class="thick-right-border" colspan="2">Target Level</th>
+							</tr>
+							<tr class="bg-primary">
+								<th>Resource</th>
+								<th>XP</th>
+								<th class="thick-right-border">XP/SD</th>
+								<th>Res</th>
+								<th class="thick-right-border">XP</th>
+								<th>Res</th>
+								<th class="thick-right-border">SD</th>
+								<th>Res</th>
+								<th>SD</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="bg-secondary">
+								<td colspan="3" class="thick-right-border">
+									<img :src="skills.mining.image" class="img-inline-25" />
+									<span>{{skills.mining.name}} ({{skillLevels.mining}})</span>
+								</td>
+								<td colspan="4" class="thick-right-border">
+									<form>
+										<div class="form-row">
+											<div class="col-auto">
+												<img :src="tools.pickaxe.image" class="img-inline-25">
+												<img v-if="gems[tools.pickaxe.gem].image" :src="gems[tools.pickaxe.gem].image" class="img-inline-25">
+											</div>
+											<div class="col">
+												<select v-model="tools.pickaxe.gem" @change="saveCookie()" class="form-control form-control-sm">
+													<option v-for="gem in gems" :value="gem.key">
+														{{gem.name}}
+													</option>
+												</select>
+											</div>
+										</div>
+									</form>
+								</td>
+								<td colspan="2">
+									<div class="input-group input-group-sm">
+										<div class="input-group-prepend">
+											<span class="input-group-text">Target Mining:</span>
+										</div>
+										<input type="number" v-model.number="skills.mining.targetLevel" @change="saveCookie()" step="1" min="1" max="100" class="form-control">
+									</div>
+								</td>
+							</tr>
+							<tr v-for="ore in ores" v-if="ore.key!='none'" :class="ore.bgClass">
+								<td>
+									<img v-if="ore.image" :src="ore.image" class="img-inline-25" />
+									<span>{{ore.name}}</span>
+								</td>
+								<td class="text-right">{{ore.xp}}<span v-if="donorBonus"> &times; {{xpMultiplier}}</span></td>
+								<td class="text-right thick-right-border">{{gems[tools.pickaxe.gem].sdxp}}</td>
+								<td v-if="typeof ore.xp=='number'" class="text-right">{{commafy(Math.floor(stardust/(ore.xp*gems[tools.pickaxe.gem].sdxp)))}}</td>
+								<td v-else class="text-right">?</td>
+								<td v-if="typeof ore.xp=='number'" class="text-right thick-right-border">{{commafy(Math.floor(Math.floor(stardust/(ore.xp*gems[tools.pickaxe.gem].sdxp))*ore.xp*xpMultiplier))}}</td>
+								<td v-else class="text-right">?</td>
+								<td v-if="typeof ore.xp=='number'" class="text-right">{{commafy(Math.ceil(skillNext.mining/(ore.xp*xpMultiplier)))}}</td>
+								<td v-else class="text-right">?</td>
+								<td v-if="typeof ore.xp=='number'" class="text-right thick-right-border">{{commafy(Math.ceil(gems[tools.pickaxe.gem].sdxp*Math.ceil(skillNext.mining/(ore.xp*xpMultiplier))*ore.xp))}}</td>
+								<td v-else class="text-right">?</td>
+								<td v-if="typeof ore.xp=='number'" class="text-right">{{commafy(Math.ceil(skillUntilTarget.mining/(ore.xp*xpMultiplier)))}}</td>
+								<td v-else class="text-right">?</td>
+								<td v-if="typeof ore.xp=='number'" class="text-right">{{commafy(Math.ceil(gems[tools.pickaxe.gem].sdxp*Math.ceil(skillUntilTarget.mining/(ore.xp*xpMultiplier))*ore.xp))}}</td>
+								<td v-else class="text-right">?</td>
+							</tr>
+							<tr class="bg-secondary">
+								<td colspan="3" class="thick-right-border">
+									<img :src="skills.crafting.image" class="img-inline-25" />
+									<span>{{skills.crafting.name}} ({{skillLevels.crafting}})</span>
+								</td>
+								<td colspan="4" class="thick-right-border">
+									<form>
+										<div class="form-row">
+											<div class="col-auto">
+												<img :src="tools.hammer.image" class="img-inline-25">
+												<img v-if="gems[tools.hammer.gem].image" :src="gems[tools.hammer.gem].image" class="img-inline-25">
+											</div>
+											<div class="col">
+												<select v-model="tools.hammer.gem" @change="saveCookie()" class="form-control form-control-sm">
+													<option v-for="gem in gems" :value="gem.key">
+														{{gem.name}}
+													</option>
+												</select>
+											</div>
+										</div>
+									</form>
+								</td>
+								<td colspan="2">
+									<div class="input-group input-group-sm">
+										<div class="input-group-prepend">
+											<span class="input-group-text">Target Crafting:</span>
+										</div>
+										<input type="number" v-model.number="skills.crafting.targetLevel" @change="saveCookie()" step="1" min="1" max="100" class="form-control">
+									</div>
+								</td>
+							</tr>
+							<tr v-for="bar in bars" v-if="bar.key!='none'" :class="bar.bgClass">
+								<td>
+									<img v-if="bar.image" :src="bar.image" class="img-inline-25" />
+									<span>{{bar.name}}</span>
+								</td>
+								<td class="text-right">{{bar.xp}}<span v-if="donorBonus"> &times; {{xpMultiplier}}</span></td>
+								<td class="text-right thick-right-border">{{gems[tools.hammer.gem].sdxp}}</td>
+								<td v-if="typeof bar.xp=='number'" class="text-right">{{commafy(Math.floor(stardust/(bar.xp*gems[tools.hammer.gem].sdxp)))}}</td>
+								<td v-else class="text-right">?</td>
+								<td v-if="typeof bar.xp=='number'" class="text-right thick-right-border">{{commafy(Math.floor(Math.floor(stardust/(bar.xp*gems[tools.hammer.gem].sdxp))*bar.xp*xpMultiplier))}}</td>
+								<td v-else class="text-right">?</td>
+								<td v-if="typeof bar.xp=='number'" class="text-right">{{commafy(Math.ceil(skillNext.crafting/(bar.xp*xpMultiplier)))}}</td>
+								<td v-else class="text-right">?</td>
+								<td v-if="typeof bar.xp=='number'" class="text-right thick-right-border">{{commafy(gems[tools.hammer.gem].sdxp*Math.ceil(skillNext.crafting/(bar.xp*xpMultiplier))*bar.xp)}}</td>
+								<td v-else class="text-right">?</td>
+								<td v-if="typeof bar.xp=='number'" class="text-right">{{commafy(Math.ceil(skillUntilTarget.crafting/(bar.xp*xpMultiplier)))}}</td>
+								<td v-else class="text-right">?</td>
+								<td v-if="typeof bar.xp=='number'" class="text-right">{{commafy(gems[tools.hammer.gem].sdxp*Math.ceil(skillUntilTarget.crafting/(bar.xp*xpMultiplier))*bar.xp)}}</td>
+								<td v-else class="text-right">?</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<!-- Farming -->
+				<div v-else-if="tab=='farming'" v-cloak>
+					<table class="table table-bordered table-sm table-hover">
+						<thead>
+							<tr class="bg-primary">
+								<th>Seed</th>
+								<th>Level</th>
+								<th>Bonemeal</th>
+								<th>XP</th>
+								<th>Cost<span class="text-danger">*</span></th>
+								<th>Cost/XP</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="seed in seeds">
+								<td>
+									<img v-if="seed.image" :src="seed.image" class="img-inline-25" />
+									<span>{{seed.name}}</span>
+								</td>
+								<td :class="{'text-danger': typeof seed.level==='number' && seed.level>skillLevels.farming}">{{seed.level}}</td>
+								<td class="text-right">{{seed.bonemeal}}</td>
+								<td class="text-right">{{commafy(seed.xp)}}<span v-if="donorBonus"> &times; {{xpMultiplier}}</span></td>
+								<td class="text-right">
+									<span v-if="!market.items[seed.key]">-</span>
+									<span v-else-if="market.items[seed.key].average==0">?</span>
+									<template v-else>
+										<span v-if="farmingCostBase=='avg'">{{commafy(Math.round(market.items[seed.key].average))}}</span>
+										<span v-else-if="farmingCostBase=='min'">{{commafy(Math.round(market.items[seed.key].min))}}</span>
+									</template>
+									
+								</td>
+								<td class="text-right">
+									<span v-if="!market.items[seed.key]">-</span>
+									<span v-else-if="seed.xp=='?' || market.items[seed.key].average==0">?</span>
+									<template v-else>
+										<span v-if="farmingCostBase=='avg'">{{commafy((market.items[seed.key].average/(seed.xp*xpMultiplier)).toFixed(1))}}</span>
+										<span v-else-if="farmingCostBase=='min'">{{commafy((market.items[seed.key].min/(seed.xp*xpMultiplier)).toFixed(1))}}</span>
+									</template>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<p>
+						<form class="form-inline">
+							<div class="form-group mb-2">
+								<label for="farming-cost-base"><span class="text-danger">*&nbsp;</span><span>Base cost on:&nbsp;</label>
+								<select v-model="farmingCostBase" id="farming-cost-base" class="form-control form-control-sm">
+									<option value="min">Minimum</option>
+									<option value="avg">Average</option>
+								</select>
+							</div>
+						</form>
+						<span class="text-danger">*&nbsp;</span><span>Cost is based on prices in available market data and only for tradable items.</span><br />
+					</p>
+				</div>
+				
+				<!-- Brewing Calc -->
+				<div v-else-if="tab=='brewingCalc'" v-cloak>
+					<table class="table table-bordered table-sm table-hover">
+						<thead>
+							<tr class="bg-primary">
+								<th>Potion</th>
+								<th>Level</th>
+								<th>XP</th>
+								<th>Cost<span class="text-danger">*</span></th>
+								<th>Cost/XP</th>
+								<th class="pl-2">Ingredients</th>
+								<th>Brewable</th>
+								<th>XP</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="potion in potions">
+								<td>
+									<img v-if="potion.image" :src="potion.image" class="img-inline-25" />
+									<span>{{potion.name}}</span>
+								</td>
+								<td class="text-right" :class="{'text-danger': potion.level>skillLevels.brewing}">{{potion.level}}</td>
+								<td class="text-right">{{potion.xp}}<span v-if="donorBonus"> &times; {{xpMultiplier}}</span></td>
+								<td class="text-right">{{commafy(potionCosts[potion.key])}}</td>
+								<td class="text-right" v-if="typeof potion.xp==='number'">{{commafy((potionCosts[potion.key]/(potion.xp*xpMultiplier)).toFixed(1))}}</td>
+								<td class="text-right" v-else>?</td>
+								<td class="pl-2">
+									<span v-for="(item, key, index) in potion.ingredients">
+										{{item}} <img :src="items[key].image" class="img-inline-25" :title="items[key].name" />
+										<span>&nbsp;</span>
+									</span>
+								</td>
+								<td class="text-right">{{brewable[potion.key]}}</td>
+								<td class="text-right" v-if="typeof potion.xp==='number'">{{commafy(Math.floor(brewable[potion.key]*potion.xp*xpMultiplier))}}</td>
+								<td class="text-right" v-else>?</td>
+							</tr>
+						</tbody>
+					</table>
+					<p>
+						<form class="form-inline">
+							<div class="form-group mb-2">
+								<label for="brewing-cost-base"><span class="text-danger">*&nbsp;</span><span>Base cost on:&nbsp;</label>
+								<select v-model="brewingCostBase" id="brewing-cost-base" class="form-control form-control-sm">
+									<option value="min">Minimum</option>
+									<option value="avg">Average</option>
+								</select>
+							</div>
+						</form>
+						<span class="text-danger">*&nbsp;</span><span>Cost is based on prices in available market data and only for tradable items.</span><br />
+					</p>
+					<form>
+						<h5>Ingredients</h5>
+						<div class="form-group row">
+							<template v-for="item in items" v-if="item.brewingIngredient">
+								<label :for="'data-'+item.key+'-gem'" class="col-sm-1 col-form-label">
+									<img v-if="item.image" :src="item.image" class="img-inline-25" :title="item.name">
+								</label>
+								<div class="col-sm-2">
+									<input v-model.number="item.amount" @change="saveCookie()" :id="'data-'+item.key+'-gem'" type="number" step="1" min="0" class="form-control">
+								</div>
+							</template>
+						</div>
+					</form>
+				</div>
+				
+				<!-- Questions/Suggestions -->
+				<div v-else-if="tab=='contact'" v-cloak>
+					<p>If you have any questions or suggestions for this page, please do not hesitate to contact me. However, please keep in mind that what is doable is limited by what data DH3 exposes. Currently there are no api calls to DH3, but according to Smitty they will be coming soon.</p>
+					<p>The best way to contact me is on the <span ><a href="https://discord.gg/c4QT4my" target="_blank" style="color: #7289DA"><i class="fab fa-discord"></i> DH3 Discord</a></span>. Send me a PM at <strong><u>Anwinity#5166</u></strong></p>
+				</div>
+				
+				<div class="text-center" style="margin-top: 8em" v-cloak>
+					<p class="text-muted text-center"><a href="https://dh3.diamondhunt.co/">Diamond Hunt 3</a> and most images on this page are the property of <a href="https://diamondhunt.co/">Diamond Hunt Games</a> and, of course, Smitty. This page is not affiliated with them in any way.</p>
+				</div>
+			</div>
+		</div>
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script src="https://kit.fontawesome.com/0b05bd876c.js" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+			integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+			crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" 
+			integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" 
+			crossorigin="anonymous"></script>
+		<script src="https://anwinity.com/common/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/moment-timezone@0.5.28/moment-timezone.js" 
+			integrity="sha256-M2lriymHX1YsEmL6OP94Bo0RuuKSyutRvFAjhZtNpmc=" 
+			crossorigin="anonymous"></script>
+		<script src="index.js?v=%VERSION%"></script>
+	</body>
+</html>
